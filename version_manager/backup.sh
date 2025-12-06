@@ -9,26 +9,26 @@ BACKUPS="$VM/backups"
 mkdir -p "$BACKUPS"
 
 timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-archive="$BACKUPS/installer_$timestamp.tar.gz"
 
-# Získání aktuální verze
-current_version=$(jq -r .current_version "$STATE")
+# Zjištění typu vydání
+release_type=$(whiptail --title "Typ verze" --radiolist "Vyber typ verze:" 15 60 5 \
+"stable" "Stabilní verze" ON \
+"beta" "Vývojová verze" OFF \
+3>&1 1>&2 2>&3)
 
-echo "[INFO] Archivace aktuální verze: $current_version"
-echo "[INFO] Cíl archivace: $archive"
+archive_tar="$BACKUPS/installer_${timestamp}_${release_type}.tar.gz"
+archive_zip="$BACKUPS/installer_${timestamp}_${release_type}.zip"
 
-# Archivace všech skriptů instalátoru
-tar -czf "$archive" \
-    "$ROOT/md_super_installer_win5.ps1" \
-    "$ROOT/md_super_installer_linux5.sh" \
-    "$ROOT/md_super_installer_termux5.sh" \
-    2>/dev/null
+echo "[INFO] Archivace verze: $archive_tar"
+tar -czf "$archive_tar" "$ROOT"/md_super_installer_*
 
-# Uložení do state.json
-jq --arg ver "$current_version" --arg time "$timestamp" \
-   '.last_backup=$time' \
+echo "[INFO] Archivace verze (zip): $archive_zip"
+zip -q "$archive_zip" "$ROOT"/md_super_installer_*
+
+jq --arg ver "$timestamp" --arg type "$release_type" \
+   '.current_version=$ver | .last_backup=$type' \
    "$STATE" > "$STATE.tmp"
 
 mv "$STATE.tmp" "$STATE"
 
-echo "[OK] Záloha vytvořena: $archive"
+whiptail --title "Hotovo" --msgbox "Záloha vytvořena:\n$archive_tar\n$archive_zip" 12 60
