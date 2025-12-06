@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Installer - Web GUI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <h1>MD Installer <span class="version">v6.0</span></h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <i class="fas fa-circle"></i>
+                <span>Připojování...</span>
+            </div>
+        </header>
+
+        <!-- Hlavní obsah -->
+        <main class="main-content">
+            <!-- Levý panel - Nástroje -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-btn active" data-view="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-btn" data-view="backups">
+                        <i class="fas fa-database"></i>
+                        <span>Zálohy</span>
+                    </button>
+                    <button class="nav-btn" data-view="versions">
+                        <i class="fas fa-code-branch"></i>
+                        <span>Verze</span>
+                    </button>
+                    <button class="nav-btn" data-view="changelog">
+                        <i class="fas fa-history"></i>
+                        <span>Changelog</span>
+                    </button>
+                    <button class="nav-btn" data-view="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Nastavení</span>
+                    </button>
+                </nav>
+
+                <!-- Rychlé akce -->
+                <div class="quick-actions">
+                    <h3><i class="fas fa-bolt"></i> Rychlé akce</h3>
+                    <button class="action-btn btn-primary" id="quickBackup">
+                        <i class="fas fa-plus"></i> Nová záloha
+                    </button>
+                    <button class="action-btn btn-secondary" id="refreshAll">
+                        <i class="fas fa-sync"></i> Obnovit vše
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Hlavní panel -->
+            <div class="content-area">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view active">
+                    <div class="view-header">
+                        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                        <p>Přehled stavu instalátoru a systému</p>
+                    </div>
+
+                    <!-- Statistiky -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="currentVersion">Načítání...</h3>
+                                <p>Aktuální verze</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="totalBackups">0</h3>
+                                <p>Celkem záloh</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="diskUsage">0 GB</h3>
+                                <p>Využito místa</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="memoryUsage">0 MB</h3>
+                                <p>Využitá paměť</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nedávné zálohy -->
+                    <div class="recent-backups">
+                        <h3><i class="fas fa-clock"></i> Nedávné zálohy</h3>
+                        <div class="backup-list" id="recentBackups">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>Žádné nedávné zálohy</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Systémové informace -->
+                    <div class="system-info">
+                        <h3><i class="fas fa-info-circle"></i> Systémové informace</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Platforma:</span>
+                                <span class="info-value" id="platformInfo">Načítání...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Poslední aktualizace:</span>
+                                <span class="info-value" id="lastUpdate">Načítání...</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Stav serveru:</span>
+                                <span class="info-value status-badge" id="serverStatus">
+                                    <i class="fas fa-circle"></i> Načítání...
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zálohy View -->
+                <div id="backupsView" class="view">
+                    <div class="view-header">
+                        <h2><i class="fas fa-database"></i> Správa záloh</h2>
+                        <p>Vytvářejte a spravujte zálohy instalátoru</p>
+                    </div>
+
+                    <div class="backup-controls">
+                        <div class="control-group">
+                            <label for="backupName">
+                                <i class="fas fa-tag"></i> Název zálohy:
+                            </label>
+                            <input type="text" id="backupName" placeholder="např. verze_2024">
+                        </div>
+
+                        <div class="control-group">
+                            <label><i class="fas fa-shield-alt"></i> Typ verze:</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="backupType" value="stable" checked>
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <i class="fas fa-check-circle"></i> Stable
+                                    </span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="backupType" value="beta">
+                                    <span class="radio-custom"></span>
+                                    <span class="radio-text">
+                                        <i class="fas fa-flask"></i> Beta
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary btn-large" id="createBackupBtn">
+                            <i class="fas fa-plus-circle"></i> Vytvořit zálohu
+                        </button>
+                    </div>
+
+                    <div class="backups-list-container">
+                        <h3><i class="fas fa-list"></i> Všechny zálohy</h3>
+                        <div class="table-container">
+                            <table class="backups-table">
+                                <thead>
+                                    <tr>
+                                        <th>Název</th>
+                                        <th>Typ</th>
+                                        <th>Velikost</th>
+                                        <th>Vytvořeno</th>
+                                        <th>Akce</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="backupsTableBody">
+                                    <!-- Naplní se JavaScriptem -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verze View -->
+                <div id="versionsView" class="view">
+                    <div class="view-header">
+                        <h2><i class="fas fa-code-branch"></i> Správa verzí</h2>
+                        <p>Přepínejte mezi různými verzemi instalátoru</p>
+                    </div>
+
+                    <div class="versions-container">
+                        <div class="version-cards" id="versionCards">
+                            <!-- Naplní se JavaScriptem -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Changelog View -->
+                <div id="changelogView" class="view">
+                    <div class="view-header">
+                        <h2><i class="fas fa-history"></i> Changelog</h2>
+                        <p>Porovnání změn mezi verzemi</p>
+                    </div>
+
+                    <div class="changelog-controls">
+                        <div class="version-selectors">
+                            <select id="versionFrom" class="version-select">
+                                <option value="">Vyberte první verzi</option>
+                            </select>
+                            <div class="vs-separator">
+                                <i class="fas fa-exchange-alt"></i> VS
+                            </div>
+                            <select id="versionTo" class="version-select">
+                                <option value="">Vyberte druhou verzi</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary" id="generateChangelogBtn">
+                            <i class="fas fa-file-alt"></i> Generovat Changelog
+                        </button>
+                    </div>
+
+                    <div class="changelog-output" id="changelogOutput">
+                        <div class="empty-state">
+                            <i class="fas fa-code-compare"></i>
+                            <p>Vyberte dvě verze pro porovnání</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nastavení View -->
+                <div id="settingsView" class="view">
+                    <div class="view-header">
+                        <h2><i class="fas fa-cog"></i> Nastavení</h2>
+                        <p>Konfigurace Version Manageru</p>
+                    </div>
+
+                    <div class="settings-container">
+                        <div class="setting-card">
+                            <h3><i class="fas fa-network-wired"></i> Síťová nastavení</h3>
+                            <div class="setting-item">
+                                <label>Port serveru:</label>
+                                <input type="number" id="serverPort" value="3000" min="1024" max="65535">
+                            </div>
+                            <div class="setting-item">
+                                <label>Auto-spuštění prohlížeče:</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="autoBrowser" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <h3><i class="fas fa-archive"></i> Nastavení záloh</h3>
+                            <div class="setting-item">
+                                <label>Maximální počet záloh:</label>
+                                <input type="number" id="maxBackups" value="50" min="1" max="1000">
+                            </div>
+                            <div class="setting-item">
+                                <label>Automatické zálohování:</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="autoBackup">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <h3><i class="fas fa-terminal"></i> Integrace</h3>
+                            <div class="setting-item">
+                                <label>Git synchronizace:</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="gitSync" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <label>Notifikace:</label>
+                                <label class="switch">
+                                    <input type="checkbox" id="notifications" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="setting-actions">
+                            <button class="btn-primary" id="saveSettings">
+                                <i class="fas fa-save"></i> Uložit nastavení
+                            </button>
+                            <button class="btn-secondary" id="resetSettings">
+                                <i class="fas fa-undo"></i> Obnovit výchozí
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span id="connectionStatus">
+                    <i class="fas fa-wifi"></i> Připojování...
+                </span>
+                <span class="separator">|</span>
+                <span id="lastRefresh">Nikdy neaktualizováno</span>
+            </div>
+            <div class="status-right">
+                <span id="onlineUsers">1 uživatel online</span>
+                <span class="separator">|</span>
+                <button class="status-btn" id="restartServer">
+                    <i class="fas fa-redo"></i> Restartovat server
+                </button>
+            </div>
+        </footer>
+
+        <!-- Modální okna -->
+        <div class="modal" id="backupModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-database"></i> Vytváření zálohy</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="backupProgress"></div>
+                        <div class="progress-text" id="backupProgressText">0%</div>
+                    </div>
+                    <div class="log-output" id="backupLog"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
