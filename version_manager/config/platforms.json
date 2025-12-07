@@ -1,0 +1,28 @@
+{
+  "platforms": {
+    "linux": {
+      "package_manager": "apt-get",
+      "install_command": "sudo apt-get install -y",
+      "backup_path": "/var/backups",
+      "config_path": "/etc/md_installer"
+    },
+    "macos": {
+      "package_manager": "brew",
+      "install_command": "brew install",
+      "backup_path": "~/Library/Backups",
+      "config_path": "~/Library/Application Support/MD Installer"
+    },
+    "windows": {
+      "package_manager": "choco",
+      "install_command": "choco install -y",
+      "backup_path": "C:/Backups",
+      "config_path": "C:/ProgramData/MD Installer"
+    },
+    "termux": {
+      "package_manager": "pkg",
+      "install_command": "pkg install -y",
+      "backup_path": "/data/data/com.termux/files/backups",
+      "config_path": "/data/data/com.termux/files/home/.md_installer"
+    }
+  }
+}
