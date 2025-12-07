@@ -1,0 +1,18 @@
+{
+  "linux": {
+    "required": ["bash", "tar", "gzip"],
+    "optional": ["whiptail", "dialog", "fzf", "jq", "curl", "node", "npm", "git"]
+  },
+  "macos": {
+    "required": ["bash", "tar", "gzip"],
+    "optional": ["whiptail", "dialog", "fzf", "jq", "curl", "node", "npm"]
+  },
+  "windows": {
+    "required": ["bash", "tar", "gzip"],
+    "optional": ["whiptail", "dialog", "fzf", "jq", "curl"]
+  },
+  "termux": {
+    "required": ["bash", "tar", "gzip"],
+    "optional": ["dialog", "git", "nodejs"]
+  }
+}
