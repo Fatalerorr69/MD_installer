@@ -1,0 +1,21 @@
+{
+    "version": "8.0",
+    "auto_backup": true,
+    "backup_retention_days": 30,
+    "compression_level": 6,
+    "notifications": true,
+    "default_gui": "auto",
+    "language": "cs",
+    "theme": "dark",
+    "max_backups": 50,
+    "backup_paths": [
+        "md_super_installer_linux5.sh",
+        "md_super_installer_termux5.sh",
+        "md_super_installer_win5.ps1"
+    ],
+    "exclude_patterns": [
+        "*.tmp",
+        "*.log",
+        "*.bak"
+    ]
+}
