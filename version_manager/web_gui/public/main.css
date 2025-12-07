@@ -1,0 +1,446 @@
+/* Hlavní styly pro MD Installer Web GUI */
+
+:root {
+    --primary-color: #4361ee;
+    --secondary-color: #3a0ca3;
+    --success-color: #4cc9f0;
+    --danger-color: #f72585;
+    --warning-color: #f8961e;
+    --info-color: #4895ef;
+    --dark-color: #1a1b26;
+    --light-color: #f8f9fa;
+    --gray-color: #6c757d;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --transition: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1b26;
+    --text-color: #c0caf5;
+    --card-bg: #292e42;
+    --border-color: #3b4261;
+    --hover-bg: #343b58;
+}
+
+[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --hover-bg: #e9ecef;
+}
+
+/* Základní reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: var(--transition);
+    min-height: 100vh;
+}
+
+/* Kontejnery */
+.container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Navigace */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 0.8rem 1rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-brand sup {
+    font-size: 0.6rem;
+    top: -0.8em;
+}
+
+/* Sidebar */
+.sidebar-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 1.5rem;
+}
+
+.sidebar-card .card-title {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.status-item {
+    margin-bottom: 0.8rem;
+}
+
+.status-item span {
+    font-size: 0.85rem;
+    color: var(--gray-color);
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.status-item .progress {
+    background-color: var(--border-color);
+}
+
+.status-item small {
+    font-size: 0.75rem;
+    color: var(--gray-color);
+    float: right;
+}
+
+.system-info small {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: var(--gray-color);
+}
+
+/* Hlavní obsah */
+#page-content {
+    min-height: calc(100vh - 200px);
+    padding: 1rem 0;
+}
+
+/* Karty */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: rgba(var(--primary-color-rgb), 0.1);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Tlačítka */
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #2a9d8f);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning-color), #e76f51);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--info-color), #4895ef);
+}
+
+/* Badges */
+.badge {
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+/* Formuláře */
+.form-control, .form-select {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
+}
+
+/* Tabulky */
+.table {
+    color: var(--text-color);
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.table th {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-color: var(--border-color);
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.table td {
+    border-color: var(--border-color);
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Progress bary */
+.progress {
+    background-color: var(--border-color);
+    border-radius: 10px;
+    height: 8px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+    transition: width 0.6s ease;
+}
+
+/* Alerty */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(42, 157, 143, 0.1));
+    color: var(--success-color);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(247, 37, 133, 0.1), rgba(231, 111, 81, 0.1));
+    color: var(--danger-color);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(248, 150, 30, 0.1), rgba(231, 111, 81, 0.1));
+    color: var(--warning-color);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(72, 149, 239, 0.1), rgba(67, 97, 238, 0.1));
+    color: var(--info-color);
+}
+
+/* List group */
+.list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+}
+
+.list-group-item:hover {
+    background-color: var(--hover-bg);
+}
+
+/* Modaly */
+.modal-content {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color);
+}
+
+/* Toast notifikace */
+.toast-container {
+    z-index: 9999;
+}
+
+.toast {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.toast-body {
+    color: var(--text-color);
+}
+
+/* Offcanvas */
+.offcanvas {
+    background-color: var(--card-bg);
+}
+
+.offcanvas-header {
+    border-bottom-color: var(--border-color);
+}
+
+/* Footer */
+.footer {
+    border-top: 1px solid var(--border-color);
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background-color: var(--card-bg);
+}
+
+/* Responsivní design */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    
+    .navbar-brand span {
+        display: none;
+    }
+    
+    .sidebar-card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn {
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .card-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .table th, .table td {
+        padding: 0.5rem;
+    }
+}
+
+/* Animace */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Utility třídy */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+.shadow-soft {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-hard {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.rounded-xl {
+    border-radius: var(--border-radius);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-all {
+    transition: var(--transition);
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
