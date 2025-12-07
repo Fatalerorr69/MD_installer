@@ -52,3 +52,32 @@ chmod +x scripts/install.sh
 
 # Spuštění
 ./md_installer.sh
+
+
+MD_installer/
+├── md_installer.sh              # HLAVNÍ SPOUŠTĚCÍ SKRIPT
+├── README.md                    # Tato dokumentace
+├── version_manager/             # Jádro aplikace
+│   ├── backup.sh               # Zálohovací skript
+│   ├── switch.sh               # Přepínač verzí
+│   ├── git_sync.sh             # Git synchronizace
+│   ├── changelog.sh            # Generátor changelogu
+│   ├── config/                 # Konfigurace
+│   │   ├── main.json
+│   │   ├── dependencies.json
+│   │   └── platforms.json
+│   ├── backups/                # Uložené zálohy
+│   ├── logs/                   # Logy aplikace
+│   └── plugins/                # Uživatelské pluginy
+├── web_gui/                    # Webové rozhraní
+│   ├── server.js
+│   ├── package.json
+│   └── public/
+│       ├── index.html
+│       └── css/
+├── scripts/                    # Pomocné skripty
+│   ├── install.sh
+│   └── update.sh
+└── docs/                       # Dokumentace
+    ├── user_guide.md
+    └── api_reference.md
