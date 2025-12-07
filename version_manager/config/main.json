@@ -1,0 +1,41 @@
+{
+  "application": {
+    "name": "MD Installer",
+    "version": "2.0.0",
+    "author": "Fatalerorr69"
+  },
+  "backup": {
+    "compression": "tar.gz",
+    "encryption": false,
+    "retention_days": 30,
+    "max_backups": 50,
+    "exclude_patterns": [
+      "*.log",
+      "*.tmp",
+      ".git/*",
+      "node_modules/*"
+    ]
+  },
+  "gui": {
+    "default_tool": "auto",
+    "theme": "dark",
+    "language": "cs_CZ",
+    "enable_animations": true
+  },
+  "web": {
+    "port": 3000,
+    "host": "localhost",
+    "enable_ssl": false,
+    "auto_start": false
+  },
+  "git": {
+    "auto_sync": false,
+    "push_on_backup": false,
+    "remote": "origin"
+  },
+  "notifications": {
+    "enabled": true,
+    "on_backup_complete": true,
+    "on_error": true
+  }
+}
