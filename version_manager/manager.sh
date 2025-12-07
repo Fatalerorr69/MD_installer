@@ -1,200 +1,200 @@
-# ... existující kód ...
+#!/usr/bin/env bash
 
-# Detekce Web GUI
-check_web_gui() {
-    if [ -f "$VM/web_gui/server.js" ]; then
-        return 0  # Web GUI je nainstalováno
+set -e
+
+ROOT="$(dirname $(dirname "$0"))"
+VM="$ROOT/version_manager"
+STATE="$VM/state.json"
+BACKUPS="$VM/backups"
+
+mkdir -p "$BACKUPS"
+
+# Výchozí stav, pokud state.json neexistuje
+if [ ! -f "$STATE" ]; then
+    echo '{"current_version":"none","last_backup":"none"}' > "$STATE"
+fi
+
+# Detekce GUI nástroje
+detect_gui() {
+    if command -v whiptail >/dev/null 2>&1; then
+        echo "whiptail"
+    elif command -v dialog >/dev/null 2>&1; then
+        echo "dialog"
     else
-        return 1  # Web GUI není nainstalováno
+        echo "text"
     fi
 }
 
-# Start Web GUI
-start_web_gui() {
-    echo "🌐 Spouštím Web GUI..."
-    cd "$VM/web_gui"
-    
-    # Kontrola závislostí
-    if [ ! -d "node_modules" ]; then
-        echo "📦 Instaluji závislosti..."
-        npm install > /dev/null 2>&1
-    fi
-    
-    # Spuštění serveru na pozadí
-    npm start &
-    SERVER_PID=$!
-    
-    echo "✅ Server běží na http://localhost:3000"
-    echo "   PID: $SERVER_PID"
+GUI=$(detect_gui)
+
+# Textové menu (fallback)
+text_menu() {
+    clear
+    echo "╔══════════════════════════════════════╗"
+    echo "║   MD INSTALLER – Version Manager 6.0 ║"
+    echo "╚══════════════════════════════════════╝"
     echo ""
-    
-    # Počkej 2 sekundy a pak otevři prohlížeč
-    sleep 2
-    
-    # Otevři prohlížeč
-    if command -v xdg-open > /dev/null 2>&1; then
-        xdg-open "http://localhost:3000" 2>/dev/null
-    elif command -v open > /dev/null 2>&1; then
-        open "http://localhost:3000" 2>/dev/null
-    elif command -v start > /dev/null 2>&1; then
-        start "http://localhost:3000" 2>/dev/null
-    fi
-    
-    echo "Stiskněte Enter pro návrat do menu..."
-    read
-    kill $SERVER_PID 2>/dev/null
-}
-
-# Instalace Web GUI
-install_web_gui() {
-    echo "📦 Instalace Web GUI..."
+    echo "1) Zálohovat aktuální verzi"
+    echo "2) Seznam verzí"
+    echo "3) Přepnout verzi"
+    echo "4) Synchronizace s Git (tagy)"
+    echo "5) Generovat Changelog"
+    echo "6) Zobrazit aktuální stav"
+    echo "7) Konec"
     echo ""
-    
-    # 1. Kontrola Node.js
-    if ! command -v node > /dev/null 2>&1; then
-        echo "❌ Node.js není nainstalován!"
-        echo ""
-        echo "Instalace Node.js:"
-        echo "• Ubuntu/Debian: sudo apt install nodejs npm"
-        echo "• Fedora: sudo dnf install nodejs"
-        echo "• macOS: brew install node"
-        echo "• Windows: https://nodejs.org"
-        echo ""
-        return 1
-    fi
-    
-    echo "✅ Node.js: $(node --version)"
-    echo "✅ npm: $(npm --version)"
-    echo ""
-    
-    # 2. Vytvoř adresářovou strukturu
-    echo "📁 Vytvářím strukturu..."
-    mkdir -p "$VM/web_gui/public" "$VM/web_gui/api"
-    
-    # 3. Vytvoř soubory (použijeme zde dokumenty z předchozího kroku)
-    echo "📝 Vytvářím soubory..."
-    
-    # server.js
-    cat > "$VM/web_gui/server.js" << 'EOF'
-// VLOŽTE OBSAH server.js ZDE
-EOF
-
-    # package.json
-    cat > "$VM/web_gui/package.json" << 'EOF'
-// VLOŽTE OBSAH package.json ZDE
-EOF
-
-    # ... a tak dále pro všechny soubory
-    
-    echo "✅ Web GUI nainstalováno!"
-    echo "Spusťte: bash $VM/manager.sh a vyberte 'Spustit Web GUI'"
+    read -p "Vyber možnost [1-7]: " choice
+    echo "$choice"
 }
 
-# Přidání volby do menu
-add_web_gui_option() {
-    if check_web_gui; then
-        echo "8 Spustit Web GUI"
-    else
-        echo "8 Nainstalovat Web GUI"
-    fi
+# Hlavní menu
+main_menu() {
+    case "$GUI" in
+        "whiptail"|"dialog")
+            $GUI --title "MD INSTALLER – Version Manager 6.0" \
+            --menu "Vyber akci:" 20 60 10 \
+                1 "Zálohovat aktuální verzi" \
+                2 "Seznam verzí" \
+                3 "Přepnout verzi" \
+                4 "Synchronizace s Git (tagy)" \
+                5 "Generovat Changelog" \
+                6 "Zobrazit aktuální stav" \
+                7 "Konec" \
+            3>&1 1>&2 2>&3
+            ;;
+        "text")
+            text_menu
+            ;;
+        *)
+            echo "Není GUI nástroj. Používám textový režim."
+            text_menu
+            ;;
+    esac
 }
 
-# Hlavní menu s Web GUI
-case "$GUI" in
-    "fzf")
-        # Přidat Web GUI do FZF options
-        options=(
-            "1 Zálohovat aktuální verzi"
-            "2 Seznam verzí"
-            "3 Přepnout verzi"
-            "4 Synchronizace s Git (tagy)"
-            "5 Generovat Changelog"
-            "6 Zobrazit aktuální stav"
-            "7 Konec"
-            "$(add_web_gui_option)"
-        )
-        
-        selection=$(printf '%s\n' "${options[@]}" | fzf_menu)
-        ;;
-    "whiptail"|"dialog")
-        # Klasické menu
-        if check_web_gui; then
-            gui_option="8" 
-            gui_text="Spustit Web GUI"
-        else
-            gui_option="8"
-            gui_text="Nainstalovat Web GUI"
-        fi
-        
-        selection=$($GUI --title "MD INSTALLER – Version Manager 6.0" \
-            --menu "Vyber akci:" 20 60 11 \
-            "1" "Zálohovat aktuální verzi" \
-            "2" "Seznam verzí" \
-            "3" "Přepnout verzi" \
-            "4" "Synchronizace s Git (tagy)" \
-            "5" "Generovat Changelog" \
-            "6" "Zobrazit aktuální stav" \
-            "7" "Konec" \
-            "$gui_option" "$gui_text" \
-            3>&1 1>&2 2>&3)
-        ;;
-    "text")
-        clear
-        echo "╔══════════════════════════════════════╗"
-        echo "║   MD INSTALLER – Version Manager 6.0 ║"
-        echo "╚══════════════════════════════════════╝"
-        echo ""
-        echo "1) Zálohovat aktuální verzi"
-        echo "2) Seznam verzí"
-        echo "3) Přepnout verzi"
-        echo "4) Synchronizace s Git (tagy)"
-        echo "5) Generovat Changelog"
-        echo "6) Zobrazit aktuální stav"
-        echo "7) Konec"
-        
-        if check_web_gui; then
-            echo "8) Spustit Web GUI"
-        else
-            echo "8) Nainstalovat Web GUI"
-        fi
-        
-        echo ""
-        read -p "Vyber možnost [1-8]: " selection
-        ;;
-esac
-
-# Zpracování výběru
-case "$selection" in
-    1|"1")
-        bash "$VM/backup.sh"
-        ;;
-    2|"2")
-        list_versions
-        ;;
-    3|"3")
-        VERSION=$(select_version_menu)
-        if [ -n "$VERSION" ]; then
-            bash "$VM/switch.sh" use "$VERSION"
-        fi
-        ;;
-    4|"4")
-        bash "$VM/git_sync.sh"
-        ;;
-    5|"5")
-        bash "$VM/changelog.sh"
-        ;;
-    6|"6")
-        show_state
-        ;;
-    7|"7"|"")
-        exit 0
-        ;;
-    8|"8")
-        if check_web_gui; then
-            start_web_gui
-        else
-            install_web_gui
+# Zobrazení stavu
+show_state() {
+    CURRENT=$(jq -r .current_version "$STATE")
+    LAST_BACKUP=$(jq -r .last_backup "$STATE")
+    
+    case "$GUI" in
+        "whiptail"|"dialog")
+            $GUI --title "Aktuální stav instalátoru" \
+            --msgbox "Aktuální verze: $CURRENT\nPoslední záloha: $LAST_BACKUP" 12 60
+            ;;
+        *)
+            echo "=== Aktuální stav instalátoru ==="
+            echo "Aktuální verze: $CURRENT"
+            echo "Poslední záloha: $LAST_BACKUP"
+            echo ""
             read -p "Stiskněte Enter pro pokračování..."
-        fi
-        ;;
-esac
+            ;;
+    esac
+}
+
+# Seznam verzí
+list_versions() {
+    if [ ! -d "$BACKUPS" ] || [ -z "$(ls -A "$BACKUPS")" ]; then
+        MSG="Žádné zálohy nebyly nalezeny."
+    else
+        VERSIONS=$(ls "$BACKUPS" 2>/dev/null | sed 's/installer_//;s/.tar.gz//;s/.zip//' | sort -r)
+        MSG="Dostupné verze:\n$VERSIONS"
+    fi
+    
+    case "$GUI" in
+        "whiptail"|"dialog")
+            $GUI --title "Dostupné verze" --msgbox "$MSG" 20 60
+            ;;
+        *)
+            echo -e "$MSG"
+            echo ""
+            read -p "Stiskněte Enter pro pokračování..."
+            ;;
+    esac
+}
+
+# Výběr verze pro přepnutí
+select_version_menu() {
+    if [ ! -d "$BACKUPS" ] || [ -z "$(ls -A "$BACKUPS")" ]; then
+        case "$GUI" in
+            "whiptail"|"dialog")
+                $GUI --title "Chyba" --msgbox "Žádné zálohy k dispozici" 10 40
+                ;;
+            *)
+                echo "Žádné zálohy k dispozici"
+                ;;
+        esac
+        echo ""
+        return
+    fi
+    
+    VERSIONS=$(ls "$BACKUPS" | sed 's/installer_//;s/.tar.gz//;s/.zip//')
+    
+    case "$GUI" in
+        "whiptail"|"dialog")
+            SELECTED=$(echo "$VERSIONS" | $GUI --menu "Vyber verzi:" 20 60 10 3>&1 1>&2 2>&3)
+            ;;
+        *)
+            echo "Dostupné verze:"
+            echo "$VERSIONS" | nl
+            read -p "Vyber číslo verze (nebo 0 pro zpět): " num
+            if [ "$num" = "0" ]; then
+                SELECTED=""
+            else
+                SELECTED=$(echo "$VERSIONS" | sed -n "${num}p")
+            fi
+            ;;
+    esac
+    
+    echo "$SELECTED"
+}
+
+# Hlavní smyčka
+while true; do
+    SELECTION=$(main_menu)
+    
+    case "$SELECTION" in
+        1|"1")
+            echo "Spouštím zálohování..."
+            bash "$VM/backup.sh"
+            ;;
+        2|"2")
+            list_versions
+            ;;
+        3|"3")
+            VERSION=$(select_version_menu)
+            if [ -n "$VERSION" ]; then
+                echo "Přepínám na verzi: $VERSION"
+                bash "$VM/switch.sh" use "$VERSION"
+                # Aktualizovat stav
+                jq --arg ver "$VERSION" '.current_version=$ver' "$STATE" > "$STATE.tmp"
+                mv "$STATE.tmp" "$STATE"
+            fi
+            ;;
+        4|"4")
+            echo "Spouštím Git synchronizaci..."
+            bash "$VM/git_sync.sh"
+            ;;
+        5|"5")
+            echo "Spouštím generování changelogu..."
+            bash "$VM/changelog.sh"
+            ;;
+        6|"6")
+            show_state
+            ;;
+        7|"7"|"")
+            echo "Ukončuji..."
+            exit 0
+            ;;
+        *)
+            case "$GUI" in
+                "whiptail"|"dialog")
+                    $GUI --title "Chyba" --msgbox "Neplatná volba: $SELECTION" 10 40
+                    ;;
+                *)
+                    echo "Neplatná volba: $SELECTION"
+                    read -p "Stiskněte Enter pro pokračování..."
+                    ;;
+            esac
+            ;;
+    esac
+done
